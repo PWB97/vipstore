@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.groupsix.vipstore.dao.OrderMapper">
+	
+	<!-- 根据订单Id删除订单 -->
+	<delete id="deleteOrderByOrderId">
+		delete from vipstore_order where orderId = #{orderId}
+	</delete>
+	
+		<!-- 根据订单Id删除订单详细表数据-->
+	<delete id="deleteOrderDetailByOrderId">
+		delete from vipstore_order_detail
+		where orderId =#{orderId}
+	</delete>
+	
+	<select id="selectOrders" resultMap="orderDetails">
+		select 
+			o.orderId,
+			o.serialNumber,
+			o.cost as orderCost,
+			od.orderDetailId,
+			od.quantity,
+			od.cost as orderDetailCost,
+			p.productId,
+			p.productName,
+			p.productPrice,
+			p.productPath,
+			p.productStock,
+			p.productIsDelete,
+			p.productOrigin
+		from vipstore_order o
+		inner join vipstore_order_detail od on o.orderId = od.orderId
+		inner join vipstore_product p on od.productId = p.productId 
+		where o.userId = #{userId} 
+	</select>
+
+	<resultMap type="com.groupsix.vipstore.pojo.Order" id="orderDetails" autoMapping="true">
+		<id property="orderId" column="orderId"/>
+		<result property="cost" column="orderCost"/>
+		<collection property="orderDetails" ofType="com.groupsix.vipstore.pojo.OrderDetail" autoMapping="true">
+			<id property="orderDetailId" column="orderDetailId"/>
+			<result property="cost" column="orderDetailCost"/>
+			<association property="product" javaType="com.groupsix.vipstore.pojo.Product" autoMapping="true">
+				<id property="productId" column="productId"/>
+			</association>
+		</collection>
+	</resultMap>
+	
+	<!-- 添加订单 -->
+	<insert id="insertOrder" useGeneratedKeys="true" keyProperty="orderId">
+		INSERT INTO vipstore_order 
+		(userId,createTime,serialNumber,cost) 
+		VALUES 
+		(#{userId}, #{createTime}, #{serialNumber}, #{cost})
+	</insert>
+	
+	<!-- 更新订单cost --> 
+	<update id="updateOrderCostByOrderId">
+	UPDATE vipstore_order
+	set cost = #{cost}
+	where
+	orderId = #{orderId}
+	</update>
+	
+	<!-- 更新订单 -->  	
+  	<update id="updateOrder">
+		UPDATE vipstore_order
+		<trim prefix="set" suffix="" suffixOverrides=",">
+			<if test="userId != null">
+				userId=#{userId},
+			</if>
+			<if test="createTime != null">
+				createTime=#{createTime},
+			</if>
+			<if test="serialNumber != null">
+				serialNumber=#{serialNumber}, 
+			</if>
+			<if test="cost != null">
+				cost=#{cost},
+			</if>
+		</trim> 
+		WHERE 
+			orderId = #{orderId}
+	</update>
+  	
+  	<!-- 单独查询订单 -->
+  	<select id="selectOrder" resultType="com.groupsix.vipstore.pojo.Order">
+	select * from vipstore_order
+	where orderId = #{orderId} 	
+  	
+  	</select>
+  	
+  	
+	<!-- 查询一个订单及其明细 -->
+	<select id="selectOrderAndDetail"  resultMap="orderAndDetail">
+	select	u.userName,u.mobile,u.address,o.*,od.quantity,od.cost as orderDetailcost,p.productId,p.productName,p.productPath,p.productPrice
+	from 
+		vipstore_user u join 
+		vipstore_order o on u.userId= o.userId JOIN	
+		vipstore_order_detail od ON o.orderId = od.orderId JOIN 
+		vipstore_product p on od.productId = p.productId
+		where o.orderId = #{orderId}
+	</select>
+	
+	<resultMap type="com.groupsix.vipstore.pojo.User" id="orderAndDetail" >
+			<result property="userName" column="userName"/>
+			<result property="mobile" column="mobile"/>
+			<result property="address" column="address"/>
+		<collection property="orders" ofType="com.groupsix.vipstore.pojo.Order" autoMapping="true">
+			<id property="orderId" column="orderId"/>
+			<result property="cost" column="cost"/>
+			<collection property="orderDetails" ofType="com.groupsix.vipstore.pojo.OrderDetail" autoMapping="true">
+				<id property="orderDetailId" column="orderDetailId"/>
+				<result property="cost" column="orderDetailcost"/>
+				<association property="product" javaType="com.groupsix.vipstore.pojo.Product" autoMapping="false">
+					<id property="productId" column="productId"/>
+					<result property="productName" column="productName"/>
+					<result property="productPath" column="productPath"/>
+					<result property="productPrice" column="productPrice"/>
+				</association>
+			</collection>
+		</collection>
+	</resultMap>
+	
+	
+	<!-- 查询用户订单及其明细 -->
+	<select id="selectUserOrders"  resultMap="userOrders">
+	select	u.userName,u.mobile,u.address,o.*,od.quantity,od.cost as orderDetailcost,p.productId,p.productName,p.productPath,p.productPrice
+	from 
+		vipstore_user u join 
+		vipstore_order o on u.userId= o.userId JOIN	
+		vipstore_order_detail od ON o.orderId = od.orderId JOIN 
+		vipstore_product p on od.productId = p.productId
+		where u.userId = #{userId}
+	</select>
+	
+	<resultMap type="com.groupsix.vipstore.pojo.User" id="userOrders" >
+			<result property="userName" column="userName"/>
+			<result property="mobile" column="mobile"/>
+			<result property="address" column="address"/>
+		<collection property="orders" ofType="com.groupsix.vipstore.pojo.Order" autoMapping="true">
+			<id property="orderId" column="orderId"/>
+			<result property="cost" column="cost"/>
+			<collection property="orderDetails" ofType="com.groupsix.vipstore.pojo.OrderDetail" autoMapping="true">
+				<id property="orderDetailId" column="orderDetailId"/>
+				<result property="cost" column="orderDetailcost"/>
+				<association property="product" javaType="com.groupsix.vipstore.pojo.Product" autoMapping="false">
+					<id property="productId" column="productId"/>
+					<result property="productName" column="productName"/>
+					<result property="productPath" column="productPath"/>
+					<result property="productPrice" column="productPrice"/>
+				</association>
+			</collection>
+		</collection>
+	</resultMap>
+	
+	<!-- 查询所有用户订单-->
+	<select id="selectAllUserOrder"  resultMap="allUserOrders">
+	select	u.userName,u.mobile,u.address,o.*,od.quantity,od.cost as orderDetailcost,p.productId,p.productName,p.productPath
+	from 
+		vipstore_user u join 
+		vipstore_order o on u.userId= o.userId JOIN	
+		vipstore_order_detail od ON o.orderId = od.orderId JOIN 
+		vipstore_product p on od.productId = p.productId
+	</select>
+	
+	<resultMap type="com.groupsix.vipstore.pojo.User" id="allUserOrders" >
+			<result property="userName" column="userName"/>
+			<result property="mobile" column="mobile"/>
+			<result property="address" column="address"/>
+		<collection property="orders" ofType="com.groupsix.vipstore.pojo.Order" autoMapping="true">
+			<id property="orderId" column="orderId"/>
+			<result property="cost" column="cost"/>
+			<collection property="orderDetails" ofType="com.groupsix.vipstore.pojo.OrderDetail" autoMapping="true">
+				<id property="orderDetailId" column="orderDetailId"/>
+				<result property="cost" column="orderDetailcost"/>
+				<association property="product" javaType="com.groupsix.vipstore.pojo.Product" autoMapping="false">
+					<id property="productId" column="productId"/>
+					<result property="productName" column="productName"/>
+					<result property="productPath" column="productPath"/>
+					<result property="productPrice" column="productPrice"/>
+				</association>
+			</collection>
+		</collection>
+	</resultMap>
+	
+	<!-- 查询订单表所有订单 -->
+	<select id="selectAllOrders" resultType="com.groupsix.vipstore.pojo.Order">
+	select * from vipstore_order	
+	</select>
+	
+</mapper>

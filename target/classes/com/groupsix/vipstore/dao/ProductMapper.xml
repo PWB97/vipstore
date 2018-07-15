@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.groupsix.vipstore.dao.ProductMapper">
+	<insert id="addProduct">
+		insert into
+			vipstore_product(
+			productId, 
+			productName,
+			productDescription,
+			productPrice,
+			productStock,
+			productIsDelete,
+			productPath,
+			productOrigin,
+			productType)
+		values(
+		#{productId}, 
+		#{productName},
+		#{productDescription},
+		#{productPrice},
+		#{productStock},
+		#{productIsDelete},
+		#{productPath},
+		#{productOrigin},
+		#{productType}
+		)
+	</insert>
+
+	<delete id="delProduct">
+		delete from vipstore_product where productId = #{productId}
+	</delete>
+	
+	<update id="updateProduct">
+		update vipstore_product
+		<set>
+			<if test="productName != null">productName =#{productName},</if>
+			<if test="productDescription != null">productDescription = #{productDescription},</if>
+			<if test="productPrice != null">productPrice = #{productPrice},</if>
+			<if test="productStock != null">productStock = #{productStock},</if>
+			<if test="productOrigin != null">productOrigin = #{productOrigin},</if>
+			<if test="productIsDelete != null">productIsDelete = #{productIsDelete},</if>
+			<if test="productPath != null">productPath = #{productPath},</if>
+			<if test="productType != null">productType = #{productType},</if>
+		</set>
+		where productId =  #{productId}
+	</update>
+	
+	<select id="findAllProduct" resultType="com.groupsix.vipstore.pojo.Product">
+		select * from vipstore_product
+	</select>
+	
+	<select id="findProductById" resultType="com.groupsix.vipstore.pojo.Product">
+		select * from vipstore_product where productId = #{productId}
+	</select>
+	
+	<select id="findProductByType" resultType="com.groupsix.vipstore.pojo.Product">
+		select * from vipstore_product where productType = #{productType}
+	</select>
+</mapper>

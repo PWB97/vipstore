@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.groupsix.vipstore.dao.OrderDetailMapper">
+	<insert id="insertOrderDetail">
+		insert into vipstore_order_detail
+		(orderId, productId, quantity, cost)
+		values
+		(#{orderId}, #{productId}, #{quantity} ,#{cost})
+	</insert>
+	
+	<delete id="deleteOrderDetail">
+		delete from vipstore_order_detail
+		where orderId = #{orderId}
+	</delete>
+</mapper>

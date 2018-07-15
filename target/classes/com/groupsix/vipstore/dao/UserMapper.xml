@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.groupsix.vipstore.dao.UserMapper">
+
+	<insert id="saveUser">
+		insert into vipstore_user(
+			loginName, 
+			userName, 
+			password, 
+			sex, 
+			identityCode, 
+			email, 
+			mobile, 
+			address,
+			type, 
+			vipCode, 
+			vipCodeUseTime)
+		values(
+				#{loginName},
+				#{userName},
+				#{password},
+				#{sex},
+				#{identityCode},
+				#{email},
+				#{mobile},
+				#{address},
+				#{type},
+				#{vipCode},
+				#{vipCodeUseTime})
+	</insert>
+	
+	<delete id="deleteUserByUserId">
+		delete from vipstore_user where userId = #{userId}
+	</delete>
+	
+	<select id="selectUserByVipCode" resultType="com.groupsix.vipstore.pojo.User">
+		select * from vipstore_user where vipCode = #{vipCode}
+	</select>
+
+	<update id="changeUserInfo">
+		update vipstore_user
+		<set>
+			<if test="loginName != null">loginName = #{loginName},</if>
+			<if test="userName != null">userName = #{userName},</if>
+			<if test="sex != null">sex = ${sex},</if>
+			<if test="identityCode != null">identityCode = #{identityCode},</if>
+			<if test="email != null">email = #{email},</if>
+			<if test="mobile != null">mobile = #{mobile},</if>
+			<if test="address != null">address = #{address},</if>
+		</set>
+		where userId = ${userId}
+	</update>
+	
+	<select id="selectAllUsers" resultType="com.groupsix.vipstore.pojo.User">
+		select * from vipstore_user
+	</select>
+	
+	<select id="selectLoginNameById" resultType="String">
+		select loginName from vipstore_user where userId = #{userId}
+	</select>
+	
+	<!-- 用户中心-用户修改密码 -->
+	<update id="updateUserPasswordById">
+		UPDATE vipstore_user 
+		SET password = #{password}
+		WHERE 
+			userId = #{userId}
+	</update>
+	<select id="selectInvitorIdAndInvitedUsers" resultMap="invitedUsers">
+		select i.userId as invitorId,
+		u.userId as invitedUserId,
+		u.loginName as invitedLoginName, 
+		u.userName as invitedUserName,
+		u.sex as invitedSex,
+		u.identityCode as invitedIdentityCode,
+		u.email as invitedEmail,
+		u.mobile as invitedMobile 
+		from vipstore_invited i
+		left join vipstore_user u on i.loginName = u.loginName
+		where i.userId = #{userId}
+	</select>
+	<resultMap id="invitedUsers" type="com.groupsix.vipstore.pojo.User" autoMapping="true">
+		<id property="userId" column="invitorId"/>
+		<collection property="inviteds" ofType="com.groupsix.vipstore.pojo.User">
+			<id property="userId" column="invitedUserId"/>
+			<result property="loginName" column="invitedLoginName"></result>
+			<result property="userName" column="invitedUserName"></result>
+			<result property="sex" column="invitedSex"></result>
+			<result property="identityCode" column="invitedIdentityCode"></result>
+			<result property="email" column="invitedEmail"></result>
+			<result property="mobile" column="invitedMobile"></result>
+		</collection>
+	</resultMap>
+	
+	<!-- 根据用户Id查询用户 -->
+	<select id="selectUserByUserId" resultType="com.groupsix.vipstore.pojo.User">
+	select *
+	from vipstore_user
+	where userId=#{userId};
+	</select>
+	
+	<!-- 根据用户Id查询用户 -->
+	<select id="selectUserByLoginName" resultType="com.groupsix.vipstore.pojo.User">
+	select *
+	from vipstore_user
+	where loginName=#{loginName};
+	</select>
+	
+	<!-- 更具登录名和密码登录 -->
+	<select id="userLogin" resultType="com.groupsix.vipstore.pojo.User">
+		SELECT * 
+		FROM vipstore_user
+		WHERE 
+			loginName = #{loginName}
+			and password = #{password}
+	</select>
+	<delete id="deleteUserByLoginName">
+		delete from vipstore_user where loginName = #{loginName}
+	</delete>
+	
+	<select id="selectTmpUsers" resultType="com.groupsix.vipstore.pojo.User">
+		select * from vipstore_user where type = -1
+	</select>
+	
+	<update id="updateTypeByUserId">
+		update vipstore_user set type = 1 where userId = #{userId}
+	</update>
+	
+	<update id="changeUserVipCodeUserTime">
+		update vipstore_user set vipCodeUseTime = #{vipCodeUseTime} where userId = #{userId}
+	</update>
+</mapper>

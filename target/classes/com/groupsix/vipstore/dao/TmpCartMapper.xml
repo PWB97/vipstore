@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.groupsix.vipstore.dao.TmpCartMapper">
+
+	<select id="selectTmpCartByUserId" resultType="com.groupsix.vipstore.pojo.TmpCart">
+		select * from vipstore_tmpcart where userId = ${userId}
+	</select>
+	
+	<insert id="addProductInCart">
+		insert into vipstore_tmpcart (userId, productId, quantity)
+		values (${userId}, ${productId}, ${quantity})
+	</insert>
+	
+	<update id="setProductNumberInCart">
+		update vipstore_tmpcart
+		set
+			quantity = ${quantity}
+		where
+			userId = ${userId} and productId = ${productId}
+	</update>
+	
+	<delete id="deleteProductInCart">
+		delete from vipstore_tmpcart
+		where
+			userId = ${userId} and productId = ${productId}
+	</delete>
+	
+</mapper>

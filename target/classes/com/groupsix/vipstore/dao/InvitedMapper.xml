@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.groupsix.vipstore.dao.InvitedMapper">
+	
+	<insert id="saveInvited">
+		insert into
+			vipstore_invited(userId, loginName)
+		values(#{userId}, #{loginName})
+	</insert>
+
+	<delete id="deleteInvited">
+		delete from vipstore_invited
+		<where>
+			<if test="userId != null">
+				and userId=${userId}
+			</if>
+			<if test="loginName != null">
+				and loginName=#{loginName}
+			</if>
+		</where> 
+	</delete>
+	
+	<delete id="deleteInvitedXH">
+		delete from vipstore_invited where loginName = #{loginName}
+	</delete>
+	
+	<select id="selectInvited" resultType="com.groupsix.vipstore.pojo.Invited">
+		select * from vipstore_invited where loginName = #{loginName}
+	</select>
+</mapper>
